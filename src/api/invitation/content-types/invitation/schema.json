@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "invitations",
+  "info": {
+    "singularName": "invitation",
+    "pluralName": "invitations",
+    "displayName": "Invitation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "FullName": {
+      "type": "string",
+      "required": true
+    },
+    "Country": {
+      "type": "string",
+      "required": true
+    },
+    "ConsulateAddress": {
+      "type": "text",
+      "required": true
+    },
+    "RegistrationCode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "EventName": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

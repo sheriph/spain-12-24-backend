@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "registrations",
+  "info": {
+    "singularName": "registration",
+    "pluralName": "registrations",
+    "displayName": "Registration",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "FullName": {
+      "type": "string",
+      "required": true
+    },
+    "Email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "Organisation": {
+      "type": "string",
+      "required": true
+    },
+    "Country": {
+      "type": "string",
+      "required": true
+    },
+    "EventName": {
+      "type": "string",
+      "required": true
+    },
+    "RegistrationCode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "PaymentStatus": {
+      "type": "enumeration",
+      "enum": [
+        "Paid",
+        "Pending"
+      ],
+      "required": true
+    },
+    "PaymentMethod": {
+      "type": "enumeration",
+      "enum": [
+        "Flutterwave"
+      ],
+      "required": true
+    },
+    "PaymentAmount": {
+      "type": "integer",
+      "required": true
+    }
+  }
+}
