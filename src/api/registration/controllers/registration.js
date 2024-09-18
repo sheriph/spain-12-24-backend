@@ -5,7 +5,8 @@
  */
 
 const SendMailClient = require("zeptomail").SendMailClient;
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
+const chromium = require("@sparticuz/chromium");
 const JsBarcode = require("jsbarcode");
 const { createCanvas } = require("canvas"); // For barcode generation
 // Canvas v1
@@ -304,8 +305,18 @@ async function generateBadgePDF(visitorData) {
     `;
 
     // Launch Puppeteer to generate PDF
-    const browser = await puppeteer.launch();
+    const executablePath = await chromium.executablePath();
+
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: executablePath,
+      headless: chromium.headless,
+    });
+
     const page = await browser.newPage();
+
+    await page.setContent(badgeHTML, { waitUntil: "networkidle0" });
 
     await page.setContent(badgeHTML, { waitUntil: "networkidle0" });
 
