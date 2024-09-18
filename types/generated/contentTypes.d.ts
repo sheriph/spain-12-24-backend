@@ -362,6 +362,110 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiInvitationInvitation extends Schema.CollectionType {
+  collectionName: 'invitations';
+  info: {
+    singularName: 'invitation';
+    pluralName: 'invitations';
+    displayName: 'Invitation';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    FullName: Attribute.String & Attribute.Required;
+    Country: Attribute.String & Attribute.Required;
+    ConsulateAddress: Attribute.Text & Attribute.Required;
+    RegistrationCode: Attribute.String & Attribute.Required & Attribute.Unique;
+    EventName: Attribute.String & Attribute.Required;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::invitation.invitation',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::invitation.invitation',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiRegistrationRegistration extends Schema.CollectionType {
+  collectionName: 'registrations';
+  info: {
+    singularName: 'registration';
+    pluralName: 'registrations';
+    displayName: 'Registration';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    FullName: Attribute.String & Attribute.Required;
+    Email: Attribute.Email & Attribute.Required & Attribute.Unique;
+    Organisation: Attribute.String & Attribute.Required;
+    Country: Attribute.String & Attribute.Required;
+    EventName: Attribute.String & Attribute.Required;
+    RegistrationCode: Attribute.String & Attribute.Required & Attribute.Unique;
+    PaymentStatus: Attribute.Enumeration<['Paid', 'Pending']> &
+      Attribute.Required;
+    PaymentMethod: Attribute.Enumeration<['Flutterwave']> & Attribute.Required;
+    PaymentAmount: Attribute.Integer & Attribute.Required;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::registration.registration',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::registration.registration',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiSubscriberSubscriber extends Schema.CollectionType {
+  collectionName: 'subscribers';
+  info: {
+    singularName: 'subscriber';
+    pluralName: 'subscribers';
+    displayName: 'Subscriber';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Email: Attribute.Email & Attribute.Required & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::subscriber.subscriber',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::subscriber.subscriber',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -788,110 +892,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
-export interface ApiInvitationInvitation extends Schema.CollectionType {
-  collectionName: 'invitations';
-  info: {
-    singularName: 'invitation';
-    pluralName: 'invitations';
-    displayName: 'Invitation';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    FullName: Attribute.String & Attribute.Required;
-    Country: Attribute.String & Attribute.Required;
-    ConsulateAddress: Attribute.Text & Attribute.Required;
-    RegistrationCode: Attribute.String & Attribute.Required & Attribute.Unique;
-    EventName: Attribute.String & Attribute.Required;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::invitation.invitation',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::invitation.invitation',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiRegistrationRegistration extends Schema.CollectionType {
-  collectionName: 'registrations';
-  info: {
-    singularName: 'registration';
-    pluralName: 'registrations';
-    displayName: 'Registration';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    FullName: Attribute.String & Attribute.Required;
-    Email: Attribute.Email & Attribute.Required & Attribute.Unique;
-    Organisation: Attribute.String & Attribute.Required;
-    Country: Attribute.String & Attribute.Required;
-    EventName: Attribute.String & Attribute.Required;
-    RegistrationCode: Attribute.String & Attribute.Required & Attribute.Unique;
-    PaymentStatus: Attribute.Enumeration<['Paid', 'Pending']> &
-      Attribute.Required;
-    PaymentMethod: Attribute.Enumeration<['Flutterwave']> & Attribute.Required;
-    PaymentAmount: Attribute.Integer & Attribute.Required;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::registration.registration',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::registration.registration',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiSubscriberSubscriber extends Schema.CollectionType {
-  collectionName: 'subscribers';
-  info: {
-    singularName: 'subscriber';
-    pluralName: 'subscribers';
-    displayName: 'Subscriber';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    Email: Attribute.Email & Attribute.Required & Attribute.Unique;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::subscriber.subscriber',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::subscriber.subscriber',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -902,6 +902,9 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::invitation.invitation': ApiInvitationInvitation;
+      'api::registration.registration': ApiRegistrationRegistration;
+      'api::subscriber.subscriber': ApiSubscriberSubscriber;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
@@ -910,9 +913,6 @@ declare module '@strapi/types' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'api::invitation.invitation': ApiInvitationInvitation;
-      'api::registration.registration': ApiRegistrationRegistration;
-      'api::subscriber.subscriber': ApiSubscriberSubscriber;
     }
   }
 }

@@ -318,8 +318,6 @@ async function generateBadgePDF(visitorData) {
 
     await page.setContent(badgeHTML, { waitUntil: "networkidle0" });
 
-    await page.setContent(badgeHTML, { waitUntil: "networkidle0" });
-
     // Generate a two-page PDF (front and back)
     const pdfBuffer = await page.pdf({
       format: "A4",
