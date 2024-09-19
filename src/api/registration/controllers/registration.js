@@ -1,8 +1,287 @@
 "use strict";
 
-/**
- * Custom registration controller
- */
+
+const SendMailClient = require("zeptomail").SendMailClient;
+
+
+module.exports = {
+  async createRegistration(ctx) {
+    try {
+      const {
+        FullName,
+        Email,
+        Organisation,
+        Country,
+        EventName,
+        RegistrationCode,
+        PaymentMethod,
+        PaymentStatus,
+        PaymentAmount,
+      } = ctx.request.body;
+
+      // Step 1: Check if the email already exists
+      const existingEmail = await strapi.db
+        .query("api::registration.registration")
+        .findOne({
+          where: { Email },
+        });
+
+      if (existingEmail) {
+        return ctx.badRequest("Email is already registered.");
+      }
+
+      // Step 2: Create a new registration entry
+      const registration = await strapi.db
+        .query("api::registration.registration")
+        .create({
+          data: {
+            FullName,
+            Email,
+            Organisation,
+            Country,
+            EventName,
+            RegistrationCode,
+            publishedAt: new Date(),
+            PaymentMethod,
+            PaymentStatus,
+            PaymentAmount,
+          },
+        });
+
+      // Log the registration creation success
+      console.log("Registration created successfully:", registration);
+
+      // Step 3: Send the registration confirmation email
+      await sendRegistrationConfirmationEmail({
+        FullName,
+        Email,
+        Organisation,
+        Country,
+        EventName,
+        RegistrationCode,
+      });
+
+      // Log the email sending success
+      console.log("Email sent successfully to:", Email);
+
+      // Respond with success
+      ctx.send({
+        message: "Registration successful!",
+        registration,
+      });
+    } catch (error) {
+      console.error("Error occurred during registration process:", error);
+      if (error.error) {
+        console.error(
+          "ZeptoMail error details:",
+          JSON.stringify(error.error, null, 2)
+        );
+      }
+      ctx.badRequest(error.message || "An error occurred during registration.");
+    }
+  },
+
+  async checkRegistration(ctx) {
+    try {
+      const { email } = ctx.query;
+
+      if (!email) {
+        return ctx.badRequest("Email is required");
+      }
+
+      const registration = await strapi.entityService.findMany(
+        "api::registration.registration",
+        {
+          filters: { Email: email },
+          limit: 1,
+        }
+      );
+
+      if (registration && registration.length > 0) {
+        return ctx.send({ registered: true });
+      } else {
+        return ctx.send({ registered: false });
+      }
+    } catch (err) {
+      return ctx.badRequest("Error checking registration", {
+        moreDetails: err,
+      });
+    }
+  },
+};
+
+// ZeptoMail configuration
+const url = "api.zeptomail.com/";
+const token =
+  "Zoho-enczapikey wSsVR60krxDxXat1zmKsduo5ml0DAFz0FUl42gehvnapGqjGpcc4khGcU1CnTfIaQm48FmNHprp/kE1U2jNfh9krmwpVWiiF9mqRe1U4J3x17qnvhDzIWW1amhSLK4IMxQ1imWBmEMki+g==";
+// @ts-ignore
+const client = new SendMailClient({ url, token });
+
+async function sendRegistrationConfirmationEmail({
+  FullName,
+  Email,
+  Organisation,
+  Country,
+  EventName,
+  RegistrationCode,
+}) {
+  try {
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Registration Confirmation - IDTAI 2024</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #444444;
+          }
+          .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            background-color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #ff4d6d;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #444444;
+          }
+          .header h1 span.text-primary {
+            color: #1d4ed8;
+          }
+          .header h1 span.text-pink-500 {
+            color: #ff4d6d;
+          }
+          .header h1 span.text-sm {
+            font-size: 16px;
+            color: #666666;
+          }
+          .content {
+            padding: 20px;
+          }
+          .content h2 {
+            font-size: 20px;
+            color: #444444;
+          }
+          .content p {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+          }
+          .footer {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+          }
+          .footer p {
+            margin: 5px 0;
+            font-size: 14px;
+          }
+          .footer a {
+            color: #ffffff;
+            text-decoration: underline;
+          }
+          .important-note {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>
+              <span class="text-primary">ID</span>
+              <span class="text-pink-500">TAI</span>
+              <span class="text-sm">2024</span>
+            </h1>
+          </div>
+          <div class="content">
+            <h2>Congratulations, ${FullName}!</h2>
+            <p>We are excited to confirm your registration for <strong>${EventName}</strong>, and we have successfully received your payment.</p>
+            <p><strong>Registration Details:</strong></p>
+            <p><strong>Full Name:</strong> ${FullName}<br />
+              <strong>Email:</strong> ${Email}<br />
+              <strong>Organisation:</strong> ${Organisation}<br />
+              <strong>Country:</strong> ${Country}<br />
+              <strong>Registration Code:</strong> ${RegistrationCode}<br />
+            </p>
+            <p><strong>Conference Date & Venue:</strong></p>
+            <p>
+              <strong>Date:</strong> November 27-29, 2024<br />
+              <strong>Venue:</strong> Palacio de Congresos de Valencia, Av. de les Corts Valencianes, 60, 46015 Valencia, Spain
+            </p>
+            <div class="important-note">
+              <p><strong>Important Information about Your Attendance Badge:</strong></p>
+              <ul>
+                <li>Your official attendance badge will be sent to this email address in a separate email within the next 24-48 hours.</li>
+                <li>Please ensure you can access and display this badge on your mobile device or print it out before arriving at the event.</li>
+                <li>Upon arrival at the conference, you will be provided with a lanyard and badge holder to display your digital or printed badge.</li>
+                <li>You must wear your badge visibly at all times during the conference for security and identification purposes.</li>
+              </ul>
+            </div>
+            <p>We look forward to seeing you at the conference!</p>
+          </div>
+          <div class="footer">
+            <p>If you have any questions or need further assistance, feel free to contact us:</p>
+            <p>Email: <a href="mailto:enquiries@idtaievents.com">enquiries@idtaievents.com</a></p>
+            <p>Location: Palacio de Congresos de Valencia</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await client.sendMail({
+      from: {
+        address: "noreply@idtaievents.com",
+        name: "IDTAI 2024",
+      },
+      to: [
+        {
+          email_address: {
+            address: Email,
+            name: FullName,
+          },
+        },
+      ],
+      subject: "Registration Confirmation - IDTAI 2024",
+      htmlbody: emailHtml,
+    });
+
+    console.log("Email sent successfully to:", Email);
+  } catch (error) {
+    console.error("Error sending email:", JSON.stringify(error, null, 2));
+    console.error("Error details:", error.error?.details);
+    throw new Error("Failed to send registration confirmation.");
+  }
+}
+
+
+
+
+
+
+/* "use strict";
 
 const SendMailClient = require("zeptomail").SendMailClient;
 const puppeteer = require("puppeteer-core");
@@ -333,7 +612,6 @@ async function generateBadgePDF(visitorData) {
   }
 }
 
-// Function to send the registration confirmation email
 async function sendRegistrationConfirmationEmail({
   FullName,
   Email,
@@ -486,3 +764,4 @@ async function sendRegistrationConfirmationEmail({
     throw new Error("Failed to send registration confirmation email.");
   }
 }
+ */
